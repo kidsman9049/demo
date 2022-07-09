@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG" monitorInterval="5">
+    <Properties>
+        <Property name="LOG_HOME" value="./log/demo"/>
+        <Property name="BACKUP_HOME" value="./log/demo/backup"/>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%style{%d{ISO8601}}{black} %highlight{%-5level] }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable"/>
+        </Console>
+
+        <!--        <RollingRandomAccessFile name="AppLog" fileName="${LOG_HOME}/app-${sys:host.name}.log" filePattern="${BACKUP_HOME}/app-${sys:host.name}-%d-%i.log.zip">-->
+        <RollingRandomAccessFile name="AppLog" fileName="${LOG_HOME}/app-${HOSTNAME}.log"
+                                 filePattern="${BACKUP_HOME}/app-${HOSTNAME}-%d-%i.log.zip">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%-5level] [%c{1.}] [%X{uuid}] - %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <Loggers>
+        <!--
+                <Logger name="idv.rap.demo.service" level="info" additivity="false">
+                    <AppenderRef ref="Applog"/>
+                </Logger>
+        -->
+
+        <!-- LOG everything at INFO level -->
+        <Root level="debug">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AppLog"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
