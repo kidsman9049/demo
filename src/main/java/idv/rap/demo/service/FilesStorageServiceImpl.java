@@ -35,7 +35,12 @@ public class FilesStorageServiceImpl implements StorageService {
 
     @Override
     public void store(MultipartFile file) {
-
+        try {
+            Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
+        } catch (IOException e) {
+            log.info("store file::io exception, ", e);
+            throw new RuntimeException("Could not initialize folder for upload!");
+        }
     }
 
     @Override

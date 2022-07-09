@@ -6,8 +6,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 
@@ -25,25 +25,29 @@ public class DemoRestfulApi {
         this.storageService = storageService;
     }
 
+    @PostConstruct
+    public void init() {
+        storageService.deleteAll();
+        storageService.init();
+    }
+
     @GetMapping(value = "/info/{filename}")
     public void getInfo(@PathVariable("filename") String filename) {
         log.info("get info request. filename=[{}]", filename);
         // Resource resource = new ClassPathResource("application.properties");
-        Resource resource = new ClassPathResource(filename);
-        if (null != resource) {
-            log.info("resource: exists=[{}]", resource.exists());
-            log.info("resource: filename=[{}]", resource.getFilename());
-            try {
-                log.info("resource: content_length=[{}]", resource.contentLength());
-                log.info("resource: file=[{}]", resource.getFile());
-                log.info("resource: isFile=[{}]", resource.isFile());
-                log.info("resource: description=[{}]", resource.getDescription());
-                log.info("resource: uri=[{}]", resource.getURI());
-                log.info("resource: url=[{}]", resource.getURL());
-            } catch (IOException e) {
-                log.info("get info:io exception, ", e);
-            }
-
+        Resource resource;
+        resource = new ClassPathResource(filename);
+        log.info("resource: exists=[{}]", resource.exists());
+        log.info("resource: filename=[{}]", resource.getFilename());
+        try {
+            log.info("resource: content_length=[{}]", resource.contentLength());
+            log.info("resource: file=[{}]", resource.getFile());
+            log.info("resource: isFile=[{}]", resource.isFile());
+            log.info("resource: description=[{}]", resource.getDescription());
+            log.info("resource: uri=[{}]", resource.getURI());
+            log.info("resource: url=[{}]", resource.getURL());
+        } catch (IOException e) {
+            log.info("get info:io exception, ", e);
         }
     }
 
@@ -65,7 +69,12 @@ public class DemoRestfulApi {
     }
 
     @PostMapping("/upload")
-    public String fileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-        return null;
+    public String fileUpload(@RequestParam("file") MultipartFile file) {
+        try {
+            storageService.store(file);
+            return "success";
+        } catch (Exception e) {
+            return "error";
+        }
     }
 }
